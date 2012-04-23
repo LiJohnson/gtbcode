@@ -25,7 +25,7 @@ p  { margin: 0 0 15px; line-height: 1.7em; }
 	#menu li a { float: left; width: 86px; text-align: center; margin: 0 2px 0 0; font-weight: bold; font-size: .8em; padding: 16px 0 21px; color: #ccc; }
 		#menu li a:hover, #menu li a.current { color: #AF1515; background: url(../images/menu.gif) no-repeat center bottom; }
 	
-#logo { float: left; margin: 40px 0 0; }
+#logo { float: left; margin: 40px 0 0;position: absolute; }
 #feature{ color: #33617F; float: right; background: #fff; width: 580px; height: 160px; margin: 0 0 40px; font-size: 1.1em; font-style: italic; padding: 10px 10px 2px; }
 	#feature img { float: left; margin: 0 20px 0 0; }
 	#feature p { margin: 10px 0 0; }
