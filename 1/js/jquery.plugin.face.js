@@ -122,9 +122,11 @@
 	
 	$.fn.faceToHtml = function()
 	{
-		var html = this.html();
+		return this.html($.faceToHtml(this.html()));
+	}
+	
+	$.faceToHtml = function(html){
 		var phraseArr = html.match(/\[[^\]]+\]/g);
-		
 		var done = [];
 		
 		for( var  i = 0 ; phraseArr && i < phraseArr.length ; i++ )
@@ -152,7 +154,7 @@
 			}
 			done.push(phraseArr[i]);
 		}
-		return this.html(html);
-	}
+		return html;
+	};
 	
 })(window.jQuery);
