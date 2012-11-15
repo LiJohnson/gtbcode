@@ -89,55 +89,60 @@
 		}
 		alertMessage.append(message);
 	};
-	$.box = function(opt,fun){
-		$.type(opt) == "string" && (opt={message:opt,close:fun});
-		opt = opt||{};
-		opt.title = opt.title||"消息";
-		opt.message = opt.message || "";
-		
-		if( $.browser.msie && $.browser.version < 8 ){
-			if( opt.ok || opt.cancel ){
-				confirm(opt.message)?opt.ok&&opt.ok():opt.cancel&&opt.cancel();
-			}else{
-				alert(opt.message);
-				opt.close && opt.close();
-			}		
-			return;
-		}
-		
-		var messageBox = $("body > #messageBox");
-		if( messageBox.length == 0 ){
-			messageBox = $("<div class='modal hide fade' id='messageBox'><div class='modal-header'><a class='close' data-dismiss='modal' style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\" >×</a><h3>对话框标题</h3></div><div class='modal-body'><p>对话框内容</p></div><div class='modal-footer'><a href='javascript:;' class='btn' id=close >关闭</a><a href='javascript:;' class='btn' id=cancel >取消</a><a href='javascript:;' class='btn' id=ok >确定</a></div></div>");
-			$("body").append(messageBox);
-		}
-		
-		opt.ok && messageBox.find("a#ok").click(opt.ok);
-		opt.cancel && messageBox.find("a#cancel").click(function(){opt.cancel();opt.cancel=false;});
-		opt.close && messageBox.find("a#close").click(function(){opt.close();opt.close=false;});
-		
+	$.box = (function(){
+		var messageBox = $("<div class='modal hide fade' id='messageBox'><div class='modal-header'><a class='close' data-dismiss='modal' style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\" >×</a><h3>对话框标题</h3></div><div class='modal-body'><p>对话框内容</p></div><div class='modal-footer'><a href='javascript:;' class='btn' id=close >关闭</a><a href='javascript:;' class='btn' id=cancel >取消</a><a href='javascript:;' class='btn' id=ok >确定</a></div></div>");
+		var clickOk = function(){};
+		var clcikCancel = function(){};
+		var clcikClose = function(){};
+		messageBox.find("a#ok").click(function(e){ clickOk(e); });
+		messageBox.find("a#cancel").click(function(e){ clcikCancel(e); clcikCancel = function(){}; });
+		messageBox.find("a#close").click(function(e){ clcikClose(e); clcikClose=function(){}; });
 		messageBox.find(".modal-footer").find("a").click(function(){messageBox.modal('hide');});
-		messageBox.find("h3").html(opt.title);
-		messageBox.find("p").html(opt.message);
-		
-		if( opt.ok || opt.cancel ){
-			 messageBox.find("a#ok").show();
-			 messageBox.find("a#cancel").show();
-			 messageBox.find("a#close").hide();
-		}
-		else{
-			 messageBox.find("a#ok").hide();
-			 messageBox.find("a#cancel").hide();
-			 messageBox.find("a#close").show();
-		}
-		
-		messageBox.modal("show");
-		messageBox.on('hidden', function () {
-			messageBox.find("a").unbind("click");
-			messageBox.unbind("hidden");
-			opt.cancel&&opt.cancel();
-			opt.close&&opt.close();
+		messageBox.on('hidden', function (){
+			clcikCancel();
+			clcikClose();
 		});
-	};
+		return function(opt,fun){
+			if( opt == 'close' )return messageBox.modal('hide') ;
+			$.type(opt) == "string" && (opt={message:opt,close:fun});
+			opt = opt||{};
+			opt.title = opt.title||"消息";
+			opt.message = opt.message || "";
+			
+			if(  !$.fn.modal || ($.browser.msie && $.browser.version < 7 ) ){ //ie6  好厉害
+				if( opt.ok || opt.cancel ){
+					confirm(opt.message)?opt.ok&&opt.ok():opt.cancel&&opt.cancel();
+				}else{
+					alert(opt.message);
+					opt.close && opt.close();
+				}		
+				return;
+			}
+			
+			clcikCancel = opt.cancel || function(){};
+			clcikClose = opt.close || function(){};
+			clickOk = opt.ok || function(){};
+			
+			messageBox.find("h3").html(opt.title);
+			messageBox.find("p").html(opt.message);
+			
+			if( opt.ok || opt.cancel ){
+				 messageBox.find("a#ok").show();
+				 messageBox.find("a#cancel").show();
+				 messageBox.find("a#close").hide();
+			}
+			else{
+				 messageBox.find("a#ok").hide();
+				 messageBox.find("a#cancel").hide();
+				 messageBox.find("a#close").show();
+			}
+			
+			messageBox.modal("show");
+
+		};
+		
+	})();
+	//$.box = 
 	/**
 	 * 异步提交当前节点里的所有 input、selest、textarea数据
 	 * @param url 		发送请求地址

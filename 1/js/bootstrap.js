@@ -200,8 +200,7 @@
 
   Button.prototype.toggle = function () {
     var $parent = this.$element.parent('[data-toggle="buttons-radio"]');
-    var toggleClass = this.$element.data("toggle-class");
-    toggleClass = toggleClass ? toggleClass : 'active';
+    var toggleClass = this.$element.data('toggle-class') || 'active';
     $parent && $parent
       .find('.'+toggleClass)
       .removeClass(toggleClass)
