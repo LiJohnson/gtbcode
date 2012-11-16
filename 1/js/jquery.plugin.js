@@ -375,7 +375,8 @@
 
 
 (function($){
-$.fn.drag = function(option){
+	if(!$)return;
+	$.fn.drag = function(option){
 	if( $.type(option) == 'string' )option = {handle:$(option)};
 	option = option||{};
 	var _drags = this;
