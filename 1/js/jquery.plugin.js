@@ -89,11 +89,22 @@
 		}
 		alertMessage.append(message);
 	};
+	/**
+	 * {
+	 * 	title:string
+	 * 	message:string
+	 * 	ok:function
+	 * 	close:function
+	 * 	cancel:function
+	 * 	timeout:int
+	 * }
+	 */
 	$.box = (function(){
-		var messageBox = $("<div class='modal hide fade' id='messageBox'><div class='modal-header'><a class='close' data-dismiss='modal' style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\" >×</a><h3>对话框标题</h3></div><div class='modal-body'><p>对话框内容</p></div><div class='modal-footer'><a href='javascript:;' class='btn' id=close >关闭</a><a href='javascript:;' class='btn' id=cancel >取消</a><a href='javascript:;' class='btn' id=ok >确定</a></div></div>");
+		var messageBox = $("<div class='modal hide fade' id='messageBox' style='display:none;overflow: hidden;' ><div class='modal-header' style='padding: 5px 15px;' ><a class='close' data-dismiss='modal' style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\" >×</a><h3 style='font-size: 13px;font-family: 微软雅黑, 黑体, sans-serif;'>对话框标题</h3></div><div class='modal-body'></div><div class='modal-footer' style='padding: 7px'><a href='javascript:;' class='btn' id=close >关闭</a><a href='javascript:;' class='btn' id=cancel >取消</a><a href='javascript:;' class='btn' id=ok >确定</a></div></div>");
 		var clickOk = function(){};
 		var clcikCancel = function(){};
 		var clcikClose = function(){};
+		var timeId = 0;
 		messageBox.find("a#ok").click(function(e){ clickOk(e); });
 		messageBox.find("a#cancel").click(function(e){ clcikCancel(e); clcikCancel = function(){}; });
 		messageBox.find("a#close").click(function(e){ clcikClose(e); clcikClose=function(){}; });
@@ -101,45 +112,63 @@
 		messageBox.on('hidden', function (){
 			clcikCancel();
 			clcikClose();
+			timeId && clearTimeout(timeId);
+			timeId = 0;
 		});
-		return function(opt,fun){
-			if( opt == 'close' )return messageBox.modal('hide') ;
-			$.type(opt) == "string" && (opt={message:opt,close:fun});
-			opt = opt||{};
-			opt.title = opt.title||"消息";
-			opt.message = opt.message || "";
-			
-			if(  !$.fn.modal || ($.browser.msie && $.browser.version < 7 ) ){ //ie6  好厉害
-				if( opt.ok || opt.cancel ){
-					confirm(opt.message)?opt.ok&&opt.ok():opt.cancel&&opt.cancel();
-				}else{
-					alert(opt.message);
-					opt.close && opt.close();
-				}		
-				return;
-			}
-			
-			clcikCancel = opt.cancel || function(){};
-			clcikClose = opt.close || function(){};
-			clickOk = opt.ok || function(){};
-			
-			messageBox.find("h3").html(opt.title);
-			messageBox.find("p").html(opt.message);
-			
+	return function(opt,fun){
+		if( opt == 'close' )return messageBox.modal('hide') ;
+		$.type(opt) == "string" && (opt={message:opt,close:fun});
+		opt = opt||{};
+		opt.title = opt.title||"消息";
+		opt.message = opt.message || opt.html || "";
+		
+		if(  !$.fn.modal 
+			|| ($.browser.msie && $.browser.version < 7 ) //ie6  好厉害
+			||  messageBox.css("display") == "block"){ //已经打开
 			if( opt.ok || opt.cancel ){
-				 messageBox.find("a#ok").show();
-				 messageBox.find("a#cancel").show();
-				 messageBox.find("a#close").hide();
-			}
-			else{
-				 messageBox.find("a#ok").hide();
-				 messageBox.find("a#cancel").hide();
-				 messageBox.find("a#close").show();
-			}
-			
-			messageBox.modal("show");
+				confirm(opt.message)?opt.ok&&opt.ok():opt.cancel&&opt.cancel();
+			}else{
+				alert(opt.message);
+				opt.close && opt.close();
+			}		
+			return;
+		}
+		
+		clcikCancel = opt.cancel || function(){};
+		clcikClose = opt.close || function(){};
+		clickOk = opt.ok || function(){};
+		
+		messageBox.find("h3").html(opt.title);
+		messageBox.find(".modal-body").html(opt.message);
+		
+		if( opt.ok || opt.cancel ){
+			 messageBox.find("a#ok").show();
+			 messageBox.find("a#cancel").show();
+			 messageBox.find("a#close").hide();
+		}
+		else{
+			 messageBox.find("a#ok").hide();
+			 messageBox.find("a#cancel").hide();
+			 messageBox.find("a#close").show();
+		}
+		timeId = 0;
+		if( $.isNumeric(opt.timeout) ){
+			var _ = function(){
+				messageBox.find("h3").html(opt.title + " <span style='color:red'> "+opt.timeout+"秒自动关闭后</span>");
+				if(opt.timeout > 0 ){
+					timeId = setTimeout(_,1000);
+				}
+				else{
+					messageBox.modal('hide');
+				}
+				opt.timeout--;
+			};
+			_();
+		}
+		
+		messageBox.modal("show");
 
-		};
+	};
 		
 	})();
 	//$.box = 
