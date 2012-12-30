@@ -521,3 +521,16 @@ $.fn.rotate = function(deg){
 };
 
 })(window.jQuery);
+
+//填充Html
+;(function(){
+	if(!$)return ;
+	
+	$.fn.setHtml = function(data){
+		var $this = this;
+		$.each( data , function(k,v){
+			$this.find("[html-"+k+"]").html(v);
+		});
+		return $this;
+	};
+})(window.jQuery);
