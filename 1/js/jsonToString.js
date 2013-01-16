@@ -8,13 +8,27 @@ var jsonToString = (function(){
 		return _type;
 	};
 	//Date RegExp
+	var fun = {
+		'function'	:function(val){return val.toString();},
+		'date'		:function(val){return 'new Date('+val*1+')';},
+		'regexp'	:function(val){return val.toString();},
+		'number'	:function(val){return val;},
+		'boolean'	:function(val){return !!val;},
+		'undefined'	:function(val){return 'undefined';},
+		'null'		:function(val){return 'null';}
+		
+	};
 	var valueToStr = function(val , deep){
 		var _type = type(val);
 		if( _type == 'object' ){
 			return objectToStr(val,deep-1);
 		}else if( _type == 'array'){
 			return arrayToStr(val,deep);
-		}else if( _type == 'function' ){
+		}else if( fun[_type] ){
+			return fun[_type](val);
+		}
+		/*
+		if( _type == 'function' ){
 			return val.toString();
 		}else if( _type == 'date' ){
 			return 'new Date('+val*1+')';
@@ -28,7 +42,8 @@ var jsonToString = (function(){
 			return 'undefined';
 		}else if( _type == 'null'){
 			return 'null';
-		}else { //others:string  ...
+		}
+		*/else { //others:string  ...
 			return strToStr(val.toString());
 		}
 	
