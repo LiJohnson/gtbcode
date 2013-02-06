@@ -16,7 +16,6 @@ var jsonToString = (function(){
 		'boolean'	:function(val){return !!val;},
 		'undefined'	:function(val){return 'undefined';},
 		'null'		:function(val){return 'null';}
-		
 	};
 	var valueToStr = function(val , deep){
 		var _type = type(val);
@@ -26,24 +25,7 @@ var jsonToString = (function(){
 			return arrayToStr(val,deep);
 		}else if( fun[_type] ){
 			return fun[_type](val);
-		}
-		/*
-		if( _type == 'function' ){
-			return val.toString();
-		}else if( _type == 'date' ){
-			return 'new Date('+val*1+')';
-		}else if( _type == 'regexp' ){
-			return val.toString();
-		}else if( _type == 'number' ){
-			return val;
-		}else if( _type == 'boolean'){
-			return !!val;
-		}else if( _type == 'undefined'){
-			return 'undefined';
-		}else if( _type == 'null'){
-			return 'null';
-		}
-		*/else { //others:string  ...
+		}else { //others:string  ...
 			return strToStr(val.toString());
 		}
 	
@@ -76,7 +58,7 @@ var jsonToString = (function(){
 		return '\"' + str + '\"';
 	};
 	return function(json , deep){
-		deep = deep || 5;
+		deep = deep || 10;
 		return objectToStr(json , deep);
 	};
 })();
