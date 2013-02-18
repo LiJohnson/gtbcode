@@ -148,7 +148,7 @@
 				
 				if(face[category][phraseArr[i]])
 				{
-					html = html.replace(phraseArr[i] , "<img src="+face[category][phraseArr[i]].url+" title='"+phraseArr[i]+"' />");
+					html = html.replace(phraseArr[i] , "<img src="+face[category][phraseArr[i]].url+" title='"+phraseArr[i].match(/[^\[\]]+/)[0]+"' />");
 					break;
 				}
 			}
