@@ -153,7 +153,7 @@
 		var clcikCancel = function(){};
 		var clcikClose = function(){};
 		var timeId = 0;
-		messageBox.find("#ok").click(function(e){ clickOk(e); });
+		messageBox.find("#ok").click(function(e){ clickOk(e);clcikCancel = function(){}; });
 		messageBox.find("#cancel").click(function(e){ clcikCancel(e); clcikCancel = function(){}; });
 		messageBox.find("#close").click(function(e){ clcikClose(e); clcikClose=function(){}; });
 		messageBox.find(".modal-footer").find(".btn").click(function(){messageBox.modal('hide');});
