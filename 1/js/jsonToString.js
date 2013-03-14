@@ -57,9 +57,9 @@ var jsonToString = (function(){
 				.replace(/\r/g,'\\r');
 		return '\"' + str + '\"';
 	};
-	return function(json , deep){
+	return function(json , deep , j ){
 		deep = deep || 10;
-		return objectToStr(json , deep);
+		return j || !window.JSON ? objectToStr(json , deep) : window.JSON.stringify(json);
 	};
 })();
 window.jsonToString = jsonToString;
