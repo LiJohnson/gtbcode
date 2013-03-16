@@ -99,31 +99,36 @@
 	
 		
 	/**
-	 * 信息提示，要要结合bootstrap使用
+	 * 信息提示，要结合bootstrap使用
 	 * @param message	信息内容
 	 * @param id		[可选]标识Id
 	 */
-	$.alertMessage = function(message , id){		
-		var alertMessage = $("body > #alertMessage");
+	$.alertMessage = (function(){
+		var $alertMessage = $("<div class='alert' style='z-index: 1000;position: fixed;top: 0; right: 0;'><a class='close' data-dismiss='alert'>×</a></div>");
 		
-		if(message == false){
-			alertMessage.find("#"+id).remove();
-			alertMessage.find("span").length == 0 && $("body").find("#alertMessage").remove();
-			return;
-		}
-		
-		$.type(message) == "string" &&( message = $("<span "+ (id?"id='"+id+"'":"") +">" + message + "<br></span>"));		
-		if(!alertMessage.length){
-			alertMessage = $("<div id='alertMessage' class='alert' style='z-index: 1000;position: fixed;top: 0; right: 0;'><a class='close' data-dismiss='alert'>×</a></div>");
-			$("body").append(alertMessage);
-		}
-		else{
-			if(id){
-				alertMessage.find("span#"+id).remove();
+		return function(message , id){
+			if( message == 'close' ){
+				return $alertMessage.remove();
 			}
-		}
-		alertMessage.append(message);
-	};
+			
+			if( $alertMessage.parent().length == 0 ){
+				$alertMessage.find("span").remove();
+				$("body").append($alertMessage);
+			}
+			var $span = false;
+			if( id ){
+				$span = $alertMessage.find("span#"+id);
+				$span = $span.length > 0 && $span;
+			}
+			
+			if( !$span ){
+				$span = $("<span "+ (id?"id='"+id+"'":"") +"></span>");
+				$alertMessage.append($span);
+			}
+			$span.html(message+"<br>");
+			
+		};
+	})(); 
 	
 	/**
 	 * 信息弹出窗口
