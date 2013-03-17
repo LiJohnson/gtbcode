@@ -56,7 +56,7 @@
 			  url: url,
 			  data: data,
 			  success: success,
-			  dataType: dataType
+			  dataType: dataType||'json'
 		});
 	};
 	
@@ -68,7 +68,7 @@
 			  url: url,
 			  data: data,
 			  success: success,
-			  dataType: dataType
+			  dataType: dataType||'json'
 		});
 	};
 	
@@ -497,7 +497,7 @@
 			if( type == 'xml' )try{data =  $.parseJSON(data);}catch (e) {}
 						
 			$.each(_form.tmpInput,function(i,_input){
-				_input.before( _form.find("input[name="+_input.attr("name")+"]") );
+				_input.before( _form.find("input[name='"+_input.attr("name")+"']") );
 				_input.remove();
 			});
 			_iframe.remove();
