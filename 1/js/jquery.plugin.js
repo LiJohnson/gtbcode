@@ -321,14 +321,21 @@
 				html = html[0]?html:$("<span class='help-inline'>"+messageError+"</span>");
 			}
 		}
+
 		if(html){
 			html.attr("check-result","");
-			var _class = checkMessge.attr("class");
-			if( _class && _class.indexOf("inp") != -1 ){
-				while( checkMessge.next().length == 1 ){ checkMessge = checkMessge.next(); }
+			var target = _input.attr("check-target");
+			if( target ){
+				$(target).html(html);
 			}
-			checkMessge.after(html);
-		}		
+			else{
+				var _class = checkMessge.attr("class");
+				if( _class && _class.indexOf("inp") != -1 ){
+					while( checkMessge.next().length == 1 ){ checkMessge = checkMessge.next(); }
+				}
+				checkMessge.after(html);
+			}
+		}	
 	};
 	$.fn.checkResult = function(b,message){ 
 		_inputError(this,b,message);
@@ -500,8 +507,12 @@
 				_input.before( _form.find("input[name='"+_input.attr("name")+"']") );
 				_input.remove();
 			});
-			_iframe.remove();
-			_form.remove();
+			
+			setTimeout(function(){
+				_iframe.remove();
+				_form.remove();
+			},300);
+
 			callback(data);
 		});
 		_form.submit();
@@ -659,16 +670,17 @@ $.fn.rotate = function(deg){
 (function($){
 	if( !$ || $.fn.setData )return;
 	
-	$.fn.setData = function(data){
+	$.fn.setData = function(data,key){
 		var _this = $(this);
 		$.each(data , function(name,value){
 			try{
-			_this.find("input[name="+name+"]:not([type=radio],[type=checkbox])").val(value);
-			_this.find("textarea[name="+name+"]").val(value);
+			name = key ? key+"."+name : name;
+			_this.find("input[name='"+name+"']:not([type=radio],[type=checkbox])").val(value);
+			_this.find("textarea[name='"+name+"']").val(value);
 			
-			_this.find("select[name="+name+"] option[value="+value+"]").attr("selected",true);
-			_this.find("input[name="+name+"][type=radio][value="+value+"]").attr("checked",true);
-			_this.find("input[name="+name+"][type=checkbox][value="+value+"]").attr("checked",true);
+			_this.find("select[name='"+name+"'] option[value="+value+"]").attr("selected",true);
+			_this.find("input[name='"+name+"'][type=radio][value="+value+"]").attr("checked",true);
+			_this.find("input[name='"+name+"'][type=checkbox][value="+value+"]").attr("checked",true);
 			}catch (e) {
 			
 			}
@@ -717,9 +729,12 @@ $.fn.rotate = function(deg){
 	};
 })(window.jQuery);
 
-//计算string长度，汉字长度为2
+
 (function(){
+	//计算string长度，汉字长度为2
 	String.prototype.len = function(){return this.length + (this.match(/[^\x00-\xff]/g)||[]).length;};	
+	//Array.indexOf
+	if(!Array.indexOf)Array.prototype.indexOf=function(r){for(var b=0;b<this.length;b++)if(this[b]==r)return b;return-1};
 })();
 
 (function($){
