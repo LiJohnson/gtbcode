@@ -83,23 +83,21 @@
 		var dePart = function(arr , start , end ){
 			var mid = start;
 			var val = arr[mid];
-
+			start++;
 			while( start < end ){
-				while( start < end && gCompare( val , arr[start] ) >= 0 )start++;
-				if( start != mid ){
-					arr.swap(start,mid);
-					mid = start;
-					//val = arr[mid];
-				}
-
-				while( start < end && gCompare( val , arr[end]) < 0 )end--;
-				if( mid != end ){
-					arr.swap(mid,end);
-					mid = end;
-					//val = arr[mid];
-				}
+				while( start < end && gCompare( val , arr[start] ) > 0 )start++;
+				while( start < end && gCompare( val , arr[end]   ) < 0 )end--;
+				start != end && arr.swap(start,end);
+				start < end && start++;
+				start < end && end--;
 			}
-			return start;
+			if( gCompare(val , arr[start]) < 0  ){
+				arr.swap(mid,start-1);
+				return start-1;
+			}else{
+				arr.swap( mid , start );
+				return start;
+			}
 		};
 		var qsort = function( arr , start , end ){
 			if( start < end ){
