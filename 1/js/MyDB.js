@@ -57,7 +57,23 @@
 			});
 		};
 		
-		//do more thing width this
+		//get all data from table
+		this.getAll = function(callBack){
+			var data={};
+			getStor(function(stor){
+				var req = stor.openCursor();
+				req.onsuccess = function(e) {
+					var result = e.target.result;
+					if( result ){
+						data[result.key]=result.value;
+						result.continue()
+					}else{
+						callBack && callBack(data);
+					}
+				};
+			});
+		};
+		//do more thing width this function
 		this.getStor = function(callBack){
 			getStor(callBack);
 		};
