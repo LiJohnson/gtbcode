@@ -402,14 +402,9 @@
 	$.fn.checkRegexp = function(type){ 
 		if(this.length == 0 )return true;
 		
-		var reg ;
-		if( checkType[type] ){
-			reg = checkType[type];
-		}
-		else if( $.type(type) === "regexp" ){
-			reg = type ;
-		}
-		else {
+		var reg = checkType[type] || type ;
+		
+		if( $.type(reg) != "regexp" ){
 			return false ;
 		}
 		
