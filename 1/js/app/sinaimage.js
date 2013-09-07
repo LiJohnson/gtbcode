@@ -84,6 +84,7 @@
         
     })();
    $formDiv.before($nick);
-   $formDiv.before( $("<button style='padding: 3px;'>addForm</button>").click(addForm));    
+   $formDiv.before( $("<button style='padding: 3px;'>addForm</button>").click(addForm)); 
+   addForm();  
     
 })();
