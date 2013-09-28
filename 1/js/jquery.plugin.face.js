@@ -48,8 +48,8 @@
 	
 	var setPosition = function(_width,_height )
 	{
-		var clientWidth = $.browser.msie?document.compatMode == "CSS1Compat"? document.documentElement.clientWidth : document.body.clientWidth:self.innerWidth;
-		var clientHeight = $.browser.msie?document.compatMode == "CSS1Compat"? document.documentElement.clientHeight : document.body.clientHeight: self.innerHeight;
+		var clientWidth = (!$.browser||$.browser.msie)?document.compatMode == "CSS1Compat"? document.documentElement.clientWidth : document.body.clientWidth:self.innerWidth;
+		var clientHeight =(!$.browser||$.browser.msie)?document.compatMode == "CSS1Compat"? document.documentElement.clientHeight : document.body.clientHeight: self.innerHeight;
 
 		var x = click_x - (_width/2) ;
 		var y = click_y + click_height;
