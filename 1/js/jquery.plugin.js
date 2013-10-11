@@ -49,11 +49,12 @@
 	$.myAjax = function(option){
 		var _complete = option['complete'] ;
 		option['complete'] = function( d1 ,d2 ){
-			$.log([d1,d2,d1.responseText]);
+			$.log(d1,d2,d1.responseText);
 			if(_complete)_complete(d1,d2 );
 		};
 		var _error = option['error'] ;
-		option['error'] = function( d1 ,d2 ){
+		option['error'] = function( d1 ,d2 ){			
+			if( 'parsererror' == d2 )option['success'](d1.responseText);
 			if(_error)_error(d1,d2 );
 		};
 		
