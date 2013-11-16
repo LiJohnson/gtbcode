@@ -17,7 +17,7 @@
 		var f = function(){};
 		if( window.console && window.console.debug ){
 			f = function(e){
-				window.console.debug(f.arguments.length > 1 ? f.arguments : e );
+				window.console.debug.apply(window.console,arguments);
 			};
 		}else{/*
 			var $de = $('<div debug="" style="display:none;position: fixed; _position: absolute; right: 0;    bottom: 0;    width: 300px;    height: 100px;    background: white;    border: 1px solid;    overflow: scroll;"></div>');

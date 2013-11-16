@@ -34,7 +34,7 @@
         return function( pid ,name){
             var src = getHost() + pid + getSuffix(name);
             
-            $("<div class=img ><a href='"+src.replace("small","large")+"' target=_blank > <img src="+src+" title='"+(new Date()).toString().match(/.+:\d+\s/)[0]+"' /></a><br><span>" + src + "<span></div>").appendTo($contain);
+            $("<div class=img ><a href='"+src.replace("small","large")+"' target=_blank > <img name="+name+" src="+src+" title='"+(new Date()).toString().match(/.+:\d+\s/)[0]+"' /></a><br><span>" + src + "<span></div>").appendTo($contain);
         };
     })();
     
@@ -57,7 +57,7 @@
 				if( q.split("=")[0] == "pid") pid = q.split("=")[1];
 			});
             
-            if(pid)addImage(pid,$file.val());
+            if(pid)addImage(pid,$file[0] && $file[0].files && $file[0].files[0] && $file[0].files[0].name || $file.val());
             
             $file.val("");
 		});
