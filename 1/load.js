@@ -6,6 +6,7 @@
 	document.body.appendChild(sc);
 	sc.onload = function(){
 		$.getScript(BASE+"jquery.plugin.js");
+		$.getScript(BASE+"ace/ace.js");
 		if( window.location.href.indexOf("weibo.com") != -1 ){
 			$.getScript(BASE+"app/sinaimage.js");
 		}
