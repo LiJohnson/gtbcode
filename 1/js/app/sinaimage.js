@@ -1,4 +1,7 @@
-(function(){
+
+var isPicuploadService  = window.location.host == "picupload.service.weibo.com";
+
+!isPicuploadService && (function(){
     $("body").empty();
     
     var action = "http://picupload.service.weibo.com/interface/pic_upload.php?cb=http%3A%2F%2Fweibo.com%2Faj%2Fstatic%2Fupimgback.html%3F_wv%3D5%26callback%3DSTK_ijax_10086&url=0&markpos=1&marks=1&app=miniblog&s=rdxt";
@@ -23,6 +26,7 @@
         var index = val.lastIndexOf ? val.lastIndexOf(".") : val.indexOf(".");
         return index != -1 ? val.substring( index ) : ".png";
     };
+
     var addImage = (function(){
         var i = 1 ;
         var getHost = function(){
@@ -37,7 +41,6 @@
             $("<div class=img ><a href='"+src.replace("small","large")+"' target=_blank > <img name="+name+" src="+src+" title='"+(new Date()).toString().match(/.+:\d+\s/)[0]+"' /></a><br><span>" + src + "<span></div>").appendTo($contain);
         };
     })();
-    
     
     var addForm = function(){
         var id = getUUID();
@@ -65,24 +68,7 @@
         $formDiv.append($form).append($iframe);
         return $form;
 	};
-    var paste = (function(){return;
-        var $paste = $("<input type=text />");
-         $formDiv.before($paste);
-        $paste.on("paste",function(e){
-            var item = e.originalEvent.clipboardData.items[0];
-            if( item.type.indexOf("image") != -1 ){
-                var r = new FileReader();
-                var $form = addForm();
-                r.onload =function(e){
-                    $form.find(":file").remove();
-                    $form.append($("<textarea name=pic1 />").val(r.result));
-                    $form.submit();
-                };
-                r.readAsBinaryString(item.getAsFile());
-            }
-        });
-        
-    })();
+
    $formDiv.before($nick);
    $formDiv.before( $("<button style='padding: 3px;'>addForm</button>").click(addForm)); 
    addForm();  
@@ -99,4 +85,88 @@
    });
    ($getHtml.add("<pre></pre>")).insertBefore("body");
 
+})();
+
+
+isPicuploadService && (function(){
+    $("body").empty();
+    $("body").append("<style>ul{width:500px;list-style: none;} li{width:100%;background:rgb(231, 227, 227);height:30px;margin-top:3px;position:relative;} ul li div{background:rgb(211, 235, 211);height:100%;} li img{max-height: 32px;max-width: 30px;}</style>");
+    $("body").append("<style>li a.close{position:absolute;top:0;right:0;}</style>");
+    var getSrc = (function(){
+        var i = 1 ;
+        var getHost = function(){
+            i = i % 4;
+            i++;
+            return "http://ww"+i+".sinaimg.cn/small/";
+        };
+        return function( pid ,name){
+            var src = getHost() + pid + ((name||"").match(/\.\w{3,4}$/)||[".png"])[0];
+            return src;            
+        };
+    })();
+
+    var imageUpload = function(file , cb , progress){
+        var xhr = new XMLHttpRequest();
+        var reader = new FileReader();
+        xhr.open("POST","http://picupload.service.weibo.com/interface/pic_upload.php?app=miniblog&data=1&markpos=1&mime=image/png&ct=0.5098001323640347&nick="+$pageImage.val());
+        //logo=&nick=%40%E7%9B%9B321&marks=1&url=0
+        xhr.upload.addEventListener("progress",function(e){              
+                progress && progress.call(xhr,e.loaded/e.total , e);
+        },false);
+
+        xhr.onprogress = function(e){$.log(xhr.status,e);};
+        xhr.onerror = function(e){
+        };
+        xhr.onload = function(){
+            var data = eval("("+xhr.responseText.match(/\{.+$/)[0]+")");
+            $.log( data );
+            cb && cb.call(xhr,data.data.pics.pic_1);
+        };
+        reader.onload = function(){
+            xhr.send(reader.result);    
+        };
+        reader.readAsArrayBuffer(file);
+
+        return xhr;
+    };
+
+    var $pageImage = $("<textarea placeholder=pasteImage />").appendTo("body");
+    var $file = $("<input type=file multiple=true />").appendTo("body");
+    $("<button>getHtml</button>").appendTo("body").click(function(){
+        var html = [];
+        $("img").each(function(){
+            html.push(this.outerHTML);
+        });
+        $pageImage.val( html.join("\n") );
+    });
+    var $list = $("<ul></ul>").appendTo("body");
+
+    var uploadView = function(file){
+        var $li = $("<li><div></div><a class=close href=javascript:;>&times;</a></li>");
+        var xhr = imageUpload(file,function(data){
+            var src = getSrc(data.pid , file.name);
+            $li.find("a.close").remove();
+            $li.find("div").html("<a href="+src.replace("small","large")+" target=_blank>"+src+"</a>" + "<img name='"+file.name+"' src='"+src+"' title='"+(new Date().toString().replace(/GMT.+$/,''))+"' />");
+        },function(pre){
+            pre = pre*100+"%";
+            $li.find("div").css("width",pre).html(pre);
+        });
+
+        $li.find("a.close").click(function(){
+            xhr.abort();
+            $li.find("div").html("cancel");
+        });
+        $list.append($li);
+    };
+
+    $pageImage.getImage(function(data,file){
+        uploadView(file);
+    });
+
+    $file.change(function(){
+        for( var i = 0 , f ; f = this.files[i] ; i++ ){
+            uploadView(f);
+        }
+        $file.val("");
+    });
 })();

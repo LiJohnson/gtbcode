@@ -828,6 +828,57 @@ $.fn.rotate = function(deg){
 })(window.jQuery);
 
 
+(function($){
+	$.fn.getImage = function(cb){
+		var $this = this;
+		if( !window.FileReader )return this;
+		
+		var reader = new FileReader();
+		reader.onload =function(e){
+			/^data:image.+/.test(reader.result) && cb && cb.call && cb.call($this,reader.result,$this.data("file"));
+		};
+		
+		//paste
+		$this.on("paste",function(e){
+			var clipboardData = e.originalEvent.clipboardData || {};			
+			var item = (function( items ){ 
+				if( !items || !items.length )return false;
+				
+				for( var i = 0 ; i < items.length ; i++ ){					
+					if(items[i].type.indexOf("image") != -1){
+						return items[i];
+					} 
+				}
+				return false;
+				})(clipboardData.items);
+			
+            if( item ){
+            	$this.data("file",item.getAsFile());
+            	reader.readAsDataURL($this.data("file"));
+            }else{
+            	return e;
+            }
+		});
+		
+		//drag file
+		$this.on("dragenter",function(e){
+			$this.addClass("drag");
+		}).on("dragleave",function(e){
+			$this.removeClass("drag");
+		}).on("drop",function(e){
+			$this.removeClass("drag");
+			var file = e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files[0];
+			if( file && file.type.indexOf("image") != -1){
+				$this.data("file",file);
+				reader.readAsDataURL(file);	
+			};
+			e.preventDefault();
+		});
+		return $this;
+		
+	};
+})(window.jQuery);
+
 
 /*
 (function(){
