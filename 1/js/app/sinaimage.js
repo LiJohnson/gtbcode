@@ -108,7 +108,7 @@ isPicuploadService && (function(){
     var imageUpload = function(file , cb , progress){
         var xhr = new XMLHttpRequest();
         var reader = new FileReader();
-        xhr.open("POST","http://picupload.service.weibo.com/interface/pic_upload.php?app=miniblog&data=1&markpos=1&mime=image/png&ct=0.5098001323640347&nick="+$pageImage.val());
+        xhr.open("POST","http://picupload.service.weibo.com/interface/pic_upload.php?app=miniblog&data=1&markpos=1&mime=image/png&ct=0.5098001323640347&nick="+encodeURIComponent($pageImage.val()));
         //logo=&nick=%40%E7%9B%9B321&marks=1&url=0
         xhr.upload.addEventListener("progress",function(e){              
                 progress && progress.call(xhr,e.loaded/e.total , e);
@@ -126,7 +126,6 @@ isPicuploadService && (function(){
             xhr.send(reader.result);    
         };
         reader.readAsArrayBuffer(file);
-
         return xhr;
     };
 
@@ -137,18 +136,29 @@ isPicuploadService && (function(){
         $("img").each(function(){
             html.push(this.outerHTML);
         });
+        var getTime = function(img){
+            return (img.match(/time:\d+/)||[""])[0].replace("time:","")*1 || 0;
+        };
+        html.sort(function(a,b){
+            return getTime(a) - getTime(b);
+        });
         $pageImage.val( html.join("\n") );
     });
+
+
+
     var $list = $("<ul></ul>").appendTo("body");
 
-    var uploadView = function(file){
+    var uploadView = function(file,exifData){
         var $li = $("<li><div></div><a class=close href=javascript:;>&times;</a></li>");
         var xhr = imageUpload(file,function(data){
             var src = getSrc(data.pid , file.name);
             $li.find("a.close").remove();
             $li.find("div").html("<a href="+src.replace("small","large")+" target=_blank>"+src+"</a>" + "<img name='"+file.name+"' src='"+src+"' title='"+(new Date().toString().replace(/GMT.+$/,''))+"' />");
+
+            exifData && $li.find("img").attr("data-gps",JSON.stringify( $.extend( {time:new Date((exifData.DateTimeOriginal||"").replace(":","-").replace(":","-") )*1},exifData.GPS||{} ) ).replace(/"/g,''));
         },function(pre){
-            pre = pre*100+"%";
+            pre = (pre*100).toFixed(2)+"%";
             $li.find("div").css("width",pre).html(pre);
         });
 
@@ -164,8 +174,11 @@ isPicuploadService && (function(){
     });
 
     $file.change(function(){
-        for( var i = 0 , f ; f = this.files[i] ; i++ ){
-            uploadView(f);
+        for( var i = 0 , f ; f =  this.files[i] ; i++ ){            
+            window.getExifData ?getExifData(f,function(data,file){
+                uploadView(file,data);
+                $.log(data);
+            }) : uploadView(f);
         }
         $file.val("");
     });
