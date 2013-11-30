@@ -5,12 +5,14 @@
 	sc.src = BASE + "jquery.js";
 	document.body.appendChild(sc);
 	sc.onload = function(){
-		$.getScript(BASE+"jquery.plugin.js");
+		$.getScript(BASE+"jquery.plugin.js",function(){
+			if( window.location.href.indexOf("weibo.com") != -1 ){
+				$.getScript(BASE+"iexif.js");
+				$.getScript(BASE+"app/sinaimage.js");
+			}
+		});
 		$.getScript(BASE+"ace/ace.js");
-		if( window.location.href.indexOf("weibo.com") != -1 ){
-			$.getScript(BASE+"iexif.js");
-			$.getScript(BASE+"app/sinaimage.js");
-		}
+		
 	};
 	sc.onerror = function(e){alert("load jq error" )};
 })();
