@@ -129,7 +129,7 @@ isPicuploadService && (function(){
         return xhr;
     };
 
-    var $pageImage = $("<textarea placeholder=pasteImage />").appendTo("body");
+    
     var $file = $("<input type=file multiple=true />").appendTo("body");
     $("<button>getHtml</button>").appendTo("body").click(function(){
         var html = [];
@@ -144,7 +144,8 @@ isPicuploadService && (function(){
         });
         $pageImage.val( html.join("\n") );
     });
-
+    $("body").append("<br>");
+    var $pageImage = $("<textarea placeholder=pasteImage style='width:90%;height:100px;' />").appendTo("body");
 
 
     var $list = $("<ul></ul>").appendTo("body");
