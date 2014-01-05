@@ -1,9 +1,8 @@
 //sort
 ;(function(){
 	var ex = Array.prototype;
-	var defaultComparator = function( a , b ){ return a - b; };
-	var exported = {};
-	var record = [];
+	var defaultComparator = function( a , b ){ return a == b ? 0 : a - b ; };
+
 	var Record = function( a , b , swap){ this.a = a ; this.b = b ; this.swap = !! swap; };
 	ex.record = [];
 	
@@ -17,8 +16,8 @@
 	/**
 	 * 冒泡排序
 	 */
-	ex.bubbleSort = function(compare , swap){
-		record = [];
+	ex.bubbleSort = function(compare ){
+
 		compare = compare || defaultComparator ;
 		
 		for( var i = 0 ; i < this.length ; i++ ){
@@ -28,16 +27,15 @@
 				}
 			}
 		}
-		swap && swap(record);
-		record = [];
+		
 		return this;
 	};
 	/**
 	 *	Straight Selection Sort
 	 *	直接选择排序(打擂台)
 	 */
-	ex.straightSelectionSort = function( compare , swap ){
-		record = [];
+	ex.straightSelectionSort = function( compare ){
+
 		compare = compare || defaultComparator ;
 		
 		for( var i = 0 ; i < this.length ; i++ ){
@@ -48,16 +46,13 @@
 			}
 		}
 		
-		swap && swap(record);
-		record = [];
 		return this;
 	};
 	
 	/**
 	 * 插入排序
 	 */
-	ex.insertSort = function( compare , swap ){
-		record = [];
+	ex.insertSort = function( compare ){
 		compare = compare || defaultComparator ;
 		
 		for( var i = 1 ; i < this.length ; i++ ){
@@ -69,9 +64,7 @@
 				}
 			}
 		}
-		
-		swap && swap(record);
-		record = [];
+
 		return this;
 	};
 	
@@ -106,13 +99,11 @@
 				qsort( arr , mid+1 , end );
 			}
 		};
-		return function ( compare , swap , start , end ){
-			record = [];
+		return function ( compare  ){
+
 			gCompare = compare || defaultComparator ;
 			qsort(this , 0 , this.length -1);
 
-			swap && swap(record);
-			record = [];
 			return this;
 		};
 
