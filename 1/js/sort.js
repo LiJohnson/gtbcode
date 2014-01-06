@@ -7,7 +7,6 @@
 	ex.record = [];
 	
 	ex.swap = function(n,m){
-		record.push([n,m]);
 		this.record.push( new Record( n , m , true ) );
 		var tmp = this[n];
 		this[n] = this[m];
