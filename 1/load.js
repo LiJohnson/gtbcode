@@ -12,6 +12,7 @@
 			}
 		});
 		$.getScript(BASE+"ace/ace.js");
+		$.getScript(BASE+"Base64.js");
 		
 	};
 	sc.onerror = function(e){alert("load jq error" )};
