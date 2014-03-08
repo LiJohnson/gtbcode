@@ -401,7 +401,7 @@ var threejsBird = function(doSomthingElse){
 			}
 
 			renderer = new THREE.CanvasRenderer();
-			// renderer.autoClear = false;
+			renderer.setClearColor(0xffffff);
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 			document.body.appendChild( renderer.domElement );
