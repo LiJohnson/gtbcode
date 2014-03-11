@@ -120,7 +120,7 @@
 	 */
 	$.alertMessage = (function(){
 		var $alertMessage = $("<div class='alert' style='z-index: 1000;position: fixed;top: 0; right: 0;'><a class='close' data-dismiss='alert'>×</a></div>");
-		
+		var total = 30;
 		return function(message , id){
 			if( message == 'close' ){
 				return $alertMessage.remove();
@@ -141,6 +141,11 @@
 				$alertMessage.append($span);
 			}
 			$span.html(message+"<br>");
+
+			var count = $alertMessage.find(">span").length - total;
+			if( count > 0 ){
+				$alertMessage.find(">span:lt("+count+")").remove();
+			}
 			
 		};
 	})(); 
