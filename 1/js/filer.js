@@ -1,5 +1,5 @@
 /** 
- * Copyright 2012 - Eric Bidelman
+ * Copyright 2013 - Eric Bidelman
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  * familiar UNIX commands (cp, mv, ls) for its API.
  * 
  * @author Eric Bidelman (ebidel@gmail.com)
- * @version: 0.4.1
+ * @version: 0.4.3
  */
 
 'use strict';
@@ -29,7 +29,10 @@ self.URL = self.URL || self.webkitURL;
 self.requestFileSystem = self.requestFileSystem || self.webkitRequestFileSystem;
 self.resolveLocalFileSystemURL = self.resolveLocalFileSystemURL ||
                                  self.webkitResolveLocalFileSystemURL;
-self.storageInfo = self.storageInfo || self.webkitStorageInfo;
+navigator.temporaryStorage = navigator.temporaryStorage ||
+                             navigator.webkitTemporaryStorage;
+navigator.persistentStorage = navigator.persistentStorage ||
+                              navigator.webkitPersistentStorage;
 self.BlobBuilder = self.BlobBuilder || self.MozBlobBuilder ||
                    self.WebKitBlobBuilder;
 
@@ -382,7 +385,7 @@ var Filer = new function() {
   }
 
   Filer.DEFAULT_FS_SIZE = DEFAULT_FS_SIZE;
-  Filer.version = '0.4.1';
+  Filer.version = '0.4.3';
 
   Filer.prototype = {
     get fs() {
@@ -446,9 +449,9 @@ var Filer = new function() {
 
       opt_successCallback && opt_successCallback(fs);
     };
-    
-    if (this.type == self.PERSISTENT && !!self.storageInfo) {
-      self.storageInfo.requestQuota(this.type, size, function(grantedBytes) {
+
+    if (this.type == self.PERSISTENT && !!navigator.persistentStorage) {
+      navigator.persistentStorage.requestQuota(size, function(grantedBytes) {  
         self.requestFileSystem(
             this.type, grantedBytes, init.bind(this), opt_errorHandler);
       }.bind(this), opt_errorHandler);
@@ -505,7 +508,7 @@ var Filer = new function() {
     if (dirEntryOrPath.isDirectory) { // passed a DirectoryEntry.
       callback(dirEntryOrPath);
     } else if (isFsURL_(dirEntryOrPath)) { // passed a filesystem URL.
-      getEntry_(callback, pathToFsURL_(dirEntryOrPath));
+      getEntry_(callback, dirEntryOrPath);
     } else { // Passed a path. Look up DirectoryEntry and proceeed.
       // TODO: Find way to use getEntry_(callback, dirEntryOrPath); with cwd_.
       cwd_.getDirectory(dirEntryOrPath, {}, callback, opt_errorHandler);
@@ -805,6 +808,29 @@ var Filer = new function() {
                    opt_errorHandler);
     }
   };
+  
+  /**
+   * Displays disk space usage.
+   *
+   * @param {Function} successCallback Success callback, which is passed
+   *     Used space, Free space and Currently allocated total space in bytes.
+   * @param {Function=} opt_errorHandler Optional error callback.
+   */
+  Filer.prototype.df = function(successCallback, opt_errorHandler) {
+    var queryCallback = function(byteUsed, byteCap) {
+      successCallback(byteUsed, byteCap - byteUsed, byteCap);
+    }
+    
+    if (!(navigator.temporaryStorage.queryUsageAndQuota && navigator.persistentStorage.queryUsageAndQuota)) {
+      throw new Error(NOT_IMPLEMENTED_MSG);
+    }
 
+    if (self.TEMPORARY == this.type) {
+      navigator.temporaryStorage.queryUsageAndQuota(queryCallback, opt_errorHandler);
+    } else if (self.PERSISTENT == this.type) {
+      navigator.persistentStorage.queryUsageAndQuota(queryCallback, opt_errorHandler);
+    }
+  };
+                                   
   return Filer;
 };
