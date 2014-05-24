@@ -9,9 +9,9 @@
  *		myDB.delete("a");
  */
  
-;(function(){
+;(function(win){
 
-	var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+	var indexedDB = win.indexedDB || win.webkitIndexedDB || win.mozIndexedDB || win.msIndexedDB;
 	var hasError = function(e){
 		console.log("数据存储失败！",e);
 	};
@@ -79,5 +79,5 @@
 		};
 	};
 	//export
-	window.MyDB = MyDB;
-})();
+	win.MyDB = MyDB;
+})(this);

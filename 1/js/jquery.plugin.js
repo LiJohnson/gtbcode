@@ -16,8 +16,8 @@
 	$.log = (function(){
 		var f = function(){};
 		if( window.console && window.console.debug ){
-			f = function(e){
-				window.console.debug.apply(window.console,arguments);
+			f = function(){
+				$.debug && window.console.debug.apply(window.console,arguments);
 			};
 		}else{/*
 			var $de = $('<div debug="" style="display:none;position: fixed; _position: absolute; right: 0;    bottom: 0;    width: 300px;    height: 100px;    background: white;    border: 1px solid;    overflow: scroll;"></div>');
@@ -30,7 +30,7 @@
 			};
 		*/	
 		}
-		return $.debug ? f : function(){};
+		return  f;
 	})();
 	
 	/**
@@ -49,11 +49,11 @@
 	$.myAjax = function(option){
 		var _complete = option['complete'] ;
 		option['complete'] = function( d1 ,d2 ){
-			$.log(d1,d2,d1.responseText);
+			$.log([d1,d2,d1.responseText]);
 			if(_complete)_complete(d1,d2 );
 		};
 		var _error = option['error'] ;
-		option['error'] = function( d1 ,d2 ){			
+		option['error'] = function( d1 ,d2 ){
 			if( 'parsererror' == d2 )option['success'](d1.responseText);
 			if(_error)_error(d1,d2 );
 		};
@@ -535,10 +535,14 @@
 				cb(data,e);
 			},false);
 			
+			this.abortUpload = function(){
+				xhr.abort();
+			};
+			
 			xhr.addEventListener("error",function(e){},false);			
 			xhr.open("POST", url);  
-	        xhr.send(formData);
-	        return this;
+			xhr.send(formData);
+			return this;
 		};
 		
 		return;
@@ -574,6 +578,7 @@
 	 * @param type		[可选] 返回数据类型
 	 */
 	$.fn.uploadFile = function(url , data , callback , progress, type){
+		var $this = $(this);
 		if( $.type(data) == 'function' ){
 			type = progress;
 			progress = callback;
@@ -626,7 +631,7 @@
 				$iframe.remove();
 				$form.remove();
 			},300);
-			
+			$this.abortUpload = function(){};
 			clearInterval(timeId);
 			progress(1);
 			callback(data);
@@ -639,8 +644,21 @@
 			per < 1 ? progress(per) : clearInterval(timeId);
 		}, 90);
 		
-		$form.submit();		
-	};
+		$form.submit();
+		
+		$this.abortUpload = function(){
+			$files.each(function(){
+				var $this = $(this);
+				$this.data("clone").before($this);
+				$this.data("clone").remove();
+			});
+			$iframe.remove();
+			$form.remove();
+		};
+		
+		return $this;
+	};	
+	
 })(window.jQuery);
 
 //cookie 的相关操作
@@ -832,55 +850,51 @@ $.fn.rotate = function(deg){
 	};
 })(window.jQuery);
 
-
+/**
+ * 以粘贴或拖拽的形式获取图片(文件)
+ */
 (function($){
 	$.fn.getImage = function(cb){
 		var $this = this;
 		if( !window.FileReader )return this;
 		
-		var reader = new FileReader();
-		reader.onload =function(e){
-			/^data:image.+/.test(reader.result) && cb && cb.call && cb.call($this,reader.result,$this.data("file"));
-		};
-		
-		//paste
-		$this.on("paste",function(e){
-			var clipboardData = e.originalEvent.clipboardData || {};			
-			var item = (function( items ){ 
-				if( !items || !items.length )return false;
-				
-				for( var i = 0 ; i < items.length ; i++ ){					
-					if(items[i].type.indexOf("image") != -1){
-						return items[i];
-					} 
-				}
-				return false;
-				})(clipboardData.items);
-			
-            if( item ){
-            	$this.data("file",item.getAsFile());
-            	reader.readAsDataURL($this.data("file"));
-            }else{
-            	return e;
-            }
+		$this.getFile(function(file){
+			var reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload =function(e){
+				/^data:image.+/.test(reader.result) && cb && cb.call && cb.call($this,reader.result,file);
+			};
 		});
-		
-		//drag file
-		$this.on("dragenter",function(e){
+
+		return $this;
+	};
+
+	$.fn.getFile = function(cb){
+		if(!$.isFunction(cb))return this;
+
+		var $this = $(this);
+		$this.on("paste",function(e){
+			if( e.originalEvent.clipboardData && e.originalEvent.clipboardData.items && e.originalEvent.clipboardData.items[0] ){
+				var file = e.originalEvent.clipboardData.items[0].getAsFile();
+				cb.call($this,file , [file]);
+			}
+			return e;
+		}).on("dragenter",function(e){
 			$this.addClass("drag");
 		}).on("dragleave",function(e){
 			$this.removeClass("drag");
 		}).on("drop",function(e){
 			$this.removeClass("drag");
 			var file = e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files[0];
-			if( file && file.type.indexOf("image") != -1){
-				$this.data("file",file);
-				reader.readAsDataURL(file);	
-			};
+			cb.call($this,e.originalEvent.dataTransfer.files[0] , e.originalEvent.dataTransfer.files);
 			e.preventDefault();
+		}).filter(":file").change(function(){
+			if( this.files && this.files.length > 0 ){
+				cb.call($this,this.files[0],this.files);
+			}
 		});
-		return $this;
-		
+
+		return this;
 	};
 })(window.jQuery);
 
