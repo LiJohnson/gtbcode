@@ -20,7 +20,7 @@ isPicuploadService && (function(){
 	var imageUpload = function(file , cb , progress){
 		var xhr = new XMLHttpRequest();
 		var reader = new FileReader();
-		xhr.open("POST","http://picupload.service.weibo.com/interface/pic_upload.php?app=miniblog&data=1&markpos=1&mime=image/png&ct=0.5098001323640347&nick="+encodeURIComponent($html.find("textarea").val()));
+		xhr.open("POST","http://picupload.service.weibo.com/interface/pic_upload.php?app=miniblog&data=1&url=0&markpos=1&logo=&nick=%40%E7%9B%9B321&marks=1&url=0&markpos=1&logo=&nick=%40%E7%9B%9B321&marks=1&mime=image/gif&ct=0.1310222940519452");
 		//logo=&nick=%40%E7%9B%9B321&marks=1&url=0
 		xhr.upload.addEventListener("progress",function(e){              
 				progress && progress.call(xhr,e.loaded/e.total , e);
