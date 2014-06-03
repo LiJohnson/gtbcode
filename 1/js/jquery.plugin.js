@@ -876,7 +876,7 @@ $.fn.rotate = function(deg){
 		$this.on("paste",function(e){
 			if( e.originalEvent.clipboardData  && e.originalEvent.clipboardData.items  ){
 				var files = [];
-				for( var i = 0 , item ; item =  e.originalEvent.clipboardData.items[i] ; i++ )
+				for( var i = 0 , item ; item =  e.originalEvent.clipboardData.items[i] ; i++ ){
 					item.kind == "file" && files.push(item.getAsFile());
 				}	
 				files.length && cb.call($this,files[0],files);
