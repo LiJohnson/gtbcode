@@ -874,10 +874,14 @@ $.fn.rotate = function(deg){
 
 		var $this = $(this);
 		$this.on("paste",function(e){
-			if( e.originalEvent.clipboardData && e.originalEvent.clipboardData.items && e.originalEvent.clipboardData.items[0] ){
-				var file = e.originalEvent.clipboardData.items[0].getAsFile();
-				cb.call($this,file , [file]);
+			if( e.originalEvent.clipboardData  && e.originalEvent.clipboardData.items  ){
+				var files = [];
+				for( var i = 0 , item ; item =  e.originalEvent.clipboardData.items[i] ; i++ )
+					item.kind == "file" && files.push(item.getAsFile());
+				}	
+				files.length && cb.call($this,files[0],files);
 			}
+
 			return e;
 		}).on("dragenter",function(e){
 			$this.addClass("drag");
