@@ -15,7 +15,7 @@ $(function(){
 	var $canvas ;
 	var doSomthingElse = function(cav){
 		$canvas = $(cav);
-		$canvas.css({position:"fixed",left:0,top:0,zIndex:(localStorage.zIndex||-1)});
+		$canvas.css({position:"fixed",left:0,top:0,opacity:0.3,zIndex:(localStorage.zIndex||-1)});
 	};
 	$controlPanel.find("input[type=range]").change(function(){ $canvas.css('z-index',( localStorage.zIndex = this.value)); });
 	$controlPanel.find("input[type=checkbox]").change(function(){

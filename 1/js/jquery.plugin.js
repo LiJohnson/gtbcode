@@ -243,6 +243,66 @@
 		
 	})();
 
+//box bootstrap3
+(function(){
+	var Box = function(opt , cb){
+		var html = '<div class="modal fade">	<div class="modal-dialog">	<div class="modal-content">		<div class="modal-header">		<button type="button" class="close">&times;</button>		<h4 class="modal-title"></h4>		</div>		<div class="modal-body">		</div>		<div class="modal-footer">		</div>	</div>	</div></div>';
+		var $box = $(html);
+		var defaultOption = {title:'消息',buttons:[]};
+		var _this = this;
+		if( typeof opt == 'string' ){
+				opt = {message:opt,close:cb};
+		}
+
+		opt = $.extend(defaultOption,opt);
+		opt.html = opt.html || opt.message ;
+
+		opt.close && opt.buttons.push({name:opt.closeName || '关闭',click:opt.close});
+		opt.ok && opt.buttons.push({name: opt.okName || '确定',click:opt.ok});
+		opt.cancel && opt.buttons.push({name: opt.cancelName || '取消',click:opt.cancel});
+		
+		!!opt.width && $box.find(".modal-content").css("width",opt.width);
+
+		$.each(opt.buttons,function(i,btn){
+			$box.find('.modal-footer').append( $("<a class='btn btn-default btn-xs'></a>").html(btn.name).click(function(e){
+				var result = btn.click.call(this,e);
+				if( result === false )return;
+				_this.hide();
+			}));
+		});
+		
+		$box.hide().appendTo("body");
+		$box.find(".modal-header,.modal-footer").css("padding","5px");
+		$box.on("hidden.bs.modal",function(){
+			$box.remove();
+		});
+		$box.on("shown.bs.modal",function(){
+			$.fn.drag && $box.drag({handle:$box.find(".modal-header")}).attr("style","position: fixed;display: block;");
+		});
+		//
+		
+		this.show = function(html){
+			$box.find(".modal-body").html(html);
+			$box.find(".modal-title").html(opt.title);
+			$box.modal('show');
+		};
+
+		this.hide = function(){
+			$box.modal('hide');
+		};
+		this.html = function(){return $box;};
+		
+		$box.find(".close").click(function(){
+			_this.hide();
+		});
+		this.show(opt.html);
+		
+	};
+	
+	$.box3 = function(opt,cb){
+		return new Box(opt,cb).html();
+	};
+})();
 	/**
 	 * 背景遮罩
 	 * @param [可选]	打印信息
