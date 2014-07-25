@@ -914,6 +914,12 @@ $.fn.rotate = function(deg){
  * 以粘贴或拖拽的形式获取图片(文件)
  */
 (function($){
+	/**
+	 * 以粘贴或拖拽的形式获取图片
+	 * @param  Function cb 成功读到图片后的回调函数,会传入两全参数，第一个为String，是图片的dataUrl(based4)；
+	 *                     第二个是个File对象
+	 * @return 
+	 */
 	$.fn.getImage = function(cb){
 		var $this = this;
 		if( !window.FileReader )return this;
@@ -929,6 +935,11 @@ $.fn.rotate = function(deg){
 		return $this;
 	};
 
+	/**
+	 * 以粘贴或拖拽的形式获取文件
+	 * @param  Function cb 成功读到文件后的回调函数,会传入两全参数，第一个为File，第二个为FileL数组；
+	 * @return {[type]}      [description]
+	 */
 	$.fn.getFile = function(cb){
 		if(!$.isFunction(cb))return this;
 
@@ -941,7 +952,6 @@ $.fn.rotate = function(deg){
 				}	
 				files.length && cb.call($this,files[0],files);
 			}
-
 			return e;
 		}).on("dragenter",function(e){
 			$this.addClass("drag");
@@ -962,6 +972,79 @@ $.fn.rotate = function(deg){
 	};
 })(window.jQuery);
 
+/**
+ * 在选中节点上显示一个提示信息
+ * @param  string   text    提示信息内容
+ * @param  int   timeout 	[可选]固定时间后自动消失
+ * @param  Function cb      [可选]消失后会调用此方法
+ * @return 
+ */
+//tip
+(function($) {
+	if (!$) return;
+	
+	//样式
+	 var style_tip = {
+		position: 'absolute',
+		zIndex: '1030',
+		display: 'block',
+		fontSize: '11px',
+		lineHeight: 1.4,
+		opacity:0,
+		visibility: 'visible'
+	};
+	var style_tip_text = {
+		whiteSpace: 'nowrap',
+		fontSize: '12px',
+		padding: '8px',
+		color: '#5C5C5C',
+		textAlign: 'center',
+		textDecoration: 'none',
+		backgroundColor: '#FFFFFF',
+		border: '1px solid rgb(181, 210, 255)',
+		borderRadius: '4px',
+	    boxShadow:'rgb(201, 201, 201) 0px 0px 33px 5px'
+	};
+	
+	var getPosition = function(el) {
+		return $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
+			width: el.offsetWidth,
+			height: el.offsetHeight
+		}, this.offset());
+	};
+	
+	$.fn.tip = function(text , timeout , cb ){
+		if($.isFunction(timeout)){
+			 cb = timeout;
+			 timeout = 1000;
+		}
+		cb = $.isFunction(cb) ? cb : function(){};
+		timeout = timeout*1 || 1000;
+		var $this = this;
+		this.each(function(){
+			var $this = $(this);
+			var $tip = $("<div ></div>").css(style_tip).html($("<div></div>").css(style_tip_text).html(text));
+			$this.after($tip);
+			var pos = $this.getPosition(this);
+
+			var tipWidth = $tip[0].offsetWidth
+			var tipHeight = $tip[0].offsetHeight
+			var css = {top: pos.top -tipHeight , left: pos.left + pos.width / 2 - tipWidth / 2};
+			$tip.offset(css);
+			$tip.animate({opacity:1});
+			var hide = function(){
+				$tip.animate({opacity:0,top:"-="+tipHeight},function(){
+					$tip.remove();
+					cb.call($this,$tip);
+				});
+			};
+			timeout > 0 && setTimeout(hide,timeout);
+			
+			$tip.click(hide);
+		});
+		return this;
+	};
+})(window.jQuery);
 
 /*
 (function(){
