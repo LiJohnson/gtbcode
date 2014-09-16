@@ -959,8 +959,8 @@ $.fn.rotate = function(deg){
 			$this.removeClass("drag");
 		}).on("drop",function(e){
 			$this.removeClass("drag");
-			var file = e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files[0];
-			cb.call($this,e.originalEvent.dataTransfer.files[0] , e.originalEvent.dataTransfer.files);
+			var files = e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files;
+			files && cb.call($this , files[0] , files);
 			e.preventDefault();
 		}).filter(":file").change(function(){
 			if( this.files && this.files.length > 0 ){
