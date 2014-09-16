@@ -723,7 +723,7 @@
 
 //cookie 的相关操作
 (function($){ 
-	if(!$)return;
+	if(!$ || $.cookie )return;
 	
 	$.cookie = {
 		get:function(key){
