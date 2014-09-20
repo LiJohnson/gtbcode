@@ -119,7 +119,7 @@
 	 * @param id		[可选]标识Id
 	 */
 	$.alertMessage = (function(){
-		var $alertMessage = $("<div class='alert' style='z-index: 1000;position: fixed;top: 0; right: 0;'><a class='close' data-dismiss='alert'>×</a></div>");
+		var $alertMessage = $("<div class='alert alert-warning' style='z-index: 1000;position: fixed;top: 0; right: 0;'><a class='close' data-dismiss='alert'>×</a></div>");
 		var total = 30;
 		return function(message , id){
 			if( message == 'close' ){
