@@ -300,7 +300,8 @@
 	};
 	
 	$.box3 = function(opt,cb){
-		return new Box(opt,cb).html();
+		var box = new new Box(opt,cb);
+		return box.html().data('box',box);
 	};
 })();
 	/**
